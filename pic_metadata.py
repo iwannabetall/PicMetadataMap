@@ -48,7 +48,7 @@ def toDegrees(coordinates):
 
 def getLocation(exifData):
     """Returns the latitude and longitude, if available, from the provided exif_data (obtained through get_exif_data above)"""
-    result = {'lat': None, 'lon': None}
+    result = {'lat': None, 'lon': None, 'alt': None}
     if 'GPSInfo' not in exifData:
         return result
     gpsInfo = exifData["GPSInfo"]
@@ -58,8 +58,6 @@ def getLocation(exifData):
     longitudeHemisphere = gpsInfo.get('GPSLongitudeRef')
     if 'GPSAltitude' in gpsInfo:     #altitude -- drone only i think --altitude ref = 1 for all i think
     	result['alt'] = gpsInfo['GPSAltitude']
-    else: 
-    	result['alt'] = None
     if latitude and latitudeHemisphere and longitude and longitudeHemisphere:
         result['lat'] = toDegrees(latitude)
         if latitudeHemisphere == "S":
@@ -85,14 +83,17 @@ def getTime(exifData):
 
 
 if __name__ == "__main__": 
+	folder = raw_input('select a folder: ')
+	# iphone = raw_input('iphone? Y/N')
+	path = os.getcwd() + "/" + folder + '/iphone'
 	#been copy pasting this into terminal -- need to make function for date time
-	files = os.listdir(os.getcwd())
+	files = os.listdir(path)
 	#for only the files in the folder
-	imagelist = [f for f in files if not f.startswith('.') and os.path.isfile("/".join((os.getcwd(), f)))]
+	imagelist = [f for f in files if not f.startswith('.') and os.path.isfile("/".join((path, f)))]
 	bytes = []  
 		#get size of the file to ID type of photo -- low kb = likely downloads from canon 
 	for f in imagelist: 
-		onepath = "/".join((os.getcwd(), f))
+		onepath = "/".join((path, f))
 		bytes.append(os.stat(onepath).st_size)
 	lat = []
 	longitude = []
@@ -105,62 +106,85 @@ if __name__ == "__main__":
 	second = []
 	iso = []
 	exposuretime = []
+	exposuretime1 = []
+	exposuretime2 = []
 	orientation = []
 	focallength =[]
+	focallength1 =[]
+	focallength2 =[]
 	Fstop = []
+	Fstop1 = []
+	Fstop2 = []
 	alt = []
+	location = []
 
-	for imagename in imagelist:
-		image = Image.open(imagename)
-		print imagename
-		exif = getExifData(image)
-		if 'LensModel' in exif:  #not all photos have lens model
-			camerainfo = exif['LensModel']
-			cameradeets.append(camerainfo)
-		else:
-			cameradeets.append(None)	
-		if 'ISOSpeedRatings' in exif:
-			iso.append(exif['ISOSpeedRatings'])
-		else:
-			iso.append(None)
-		if 'ExposureTime' in exif:
-			exposuretime.append(exif['ExposureTime'])
-		else:
-			exposuretime.append(None)	
-		if 'FocalLength' in exif:
-			focallength.append(exif['FocalLength'])
-		else:
-			focallength.append(None)
-		if 'Orientation' in exif:  #only for iphone
-			orientation.append(exif['Orientation'])	
-		else:
-			orientation.append(None)
-		if 'FNumber' in exif:
-			Fstop.append(exif['FNumber'])
-		else:
-			Fstop.append(None)
-		# if 'GPSAltitude' in exif: 
-		# 	alt.append(exif['GPSAltitude'])
-		# else: 
-		# 	alt.append(None)
-		gpsloc = getLocation(exif)
-		lat.append(gpsloc['lat'])
-		longitude.append(gpsloc['lon'])
-		alt.append(gpsloc['alt'][0])   #i think this is in meters, units of thousands though 
-		timedata = getTime(exif)
-		day.append(timedata['day'])
-		month.append(timedata['month'])
-		year.append(timedata['year'])
-		hour.append(timedata['hour'])
-		minute.append(timedata['min'])
-		second.append(timedata['sec'])
+for imagename in imagelist:
+	image = Image.open(path + "/" + imagename)
+	print imagename
+	exif = getExifData(image)
+	if 'LensModel' in exif:  #not all photos have lens model
+		camerainfo = exif['LensModel']
+		cameradeets.append(camerainfo)
+	else:
+		cameradeets.append(None)	
+	if 'ISOSpeedRatings' in exif:
+		iso.append(exif['ISOSpeedRatings'])
+	else:
+		iso.append(None)
+	if 'ExposureTime' in exif:
+		exposuretime.append(exif['ExposureTime'])
+		a,b = exif['ExposureTime']  ##for iphones 
+		exposuretime1.append(a)
+		exposuretime2.append(b)
+	else:
+		exposuretime.append(None)	
+		exposuretime1.append(None)
+		exposuretime2.append(None)
+	if 'FocalLength' in exif:
+		focallength.append(exif['FocalLength'])
+		c, d = exif['FocalLength']
+		focallength1.append(c)
+		focallength2.append(d)
+	else:
+		focallength.append(None)
+		focallength1.append(None)
+		focallength2.append(None)
+	if 'Orientation' in exif:  #only for iphone
+		orientation.append(exif['Orientation'])	
+	else:
+		orientation.append(None)
+	if 'FNumber' in exif:
+		Fstop.append(exif['FNumber'])
+		e, f = exif['FNumber']
+		Fstop1.append(e)
+		Fstop2.append(f)
+	else:
+		Fstop.append(None)
+		Fstop1.append(None)
+		Fstop2.append(None)
+	gpsloc = getLocation(exif)
+	lat.append(gpsloc['lat'])
+	longitude.append(gpsloc['lon'])
+	if gpsloc['alt'] == None:
+		alt.append(None) 
+	else:
+		alt.append(gpsloc['alt'][0])  #i think this is in meters, units mult by 10?, altitude ref = 0
+	timedata = getTime(exif)
+	day.append(timedata['day'])
+	month.append(timedata['month'])
+	year.append(timedata['year'])
+	hour.append(timedata['hour'])
+	minute.append(timedata['min'])
+	second.append(timedata['sec'])
+	location.append(folder)
 
 # #iphone
-# df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime, orientation, focallength, Fstop, month, day, year, hour, minute, second, bytes, imagelist))
+df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime1, exposuretime2, orientation, focallength1,focallength2, Fstop1, Fstop2, month, day, year, hour, minute, second, bytes, imagelist))
 # metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude", "shotinfo","iso", "exposure_time", "orientation", "focal_length", "FStop", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename"])
+metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "orientation", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename"])
 
 #canon has tuples 
-df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime, focallength, Fstop, month, day, year, hour, minute, second, bytes, imagelist))
-metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename"])
+# df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime, focallength, Fstop, month, day, year, hour, minute, second, bytes, imagelist, location))
+# metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename", "location"])
 
-metadata.to_csv("photogps_data.csv", sep = ",", encoding = 'utf-8')
+metadata.to_csv(folder + "iphone_photogps_data.csv", sep = ",", encoding = 'utf-8')
