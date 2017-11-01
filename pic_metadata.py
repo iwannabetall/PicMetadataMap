@@ -85,7 +85,7 @@ def getTime(exifData):
 if __name__ == "__main__": 
 	folder = raw_input('select a folder: ')
 	# iphone = raw_input('iphone? Y/N')
-	path = os.getcwd() + "/" + folder + '/iphone'
+	path = os.getcwd() + "/" + folder + '/JPGs'
 	#been copy pasting this into terminal -- need to make function for date time
 	files = os.listdir(path)
 	#for only the files in the folder
@@ -117,6 +117,7 @@ if __name__ == "__main__":
 	Fstop2 = []
 	alt = []
 	location = []
+	model = []
 
 for imagename in imagelist:
 	image = Image.open(path + "/" + imagename)
@@ -127,6 +128,11 @@ for imagename in imagelist:
 		cameradeets.append(camerainfo)
 	else:
 		cameradeets.append(None)	
+	if 'Model' in exif: 
+		cameratype = exif['Model']
+		model.append(cameratype)
+	else:
+		model.append(None)
 	if 'ISOSpeedRatings' in exif:
 		iso.append(exif['ISOSpeedRatings'])
 	else:
@@ -179,12 +185,12 @@ for imagename in imagelist:
 	location.append(folder)
 
 # #iphone
-df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime1, exposuretime2, orientation, focallength1,focallength2, Fstop1, Fstop2, month, day, year, hour, minute, second, bytes, imagelist))
-# metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude", "shotinfo","iso", "exposure_time", "orientation", "focal_length", "FStop", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename"])
-metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "orientation", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename"])
+# df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime1, exposuretime2, orientation, focallength1,focallength2, Fstop1, Fstop2, month, day, year, hour, minute, second, bytes, imagelist, model))
+# # metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude", "shotinfo","iso", "exposure_time", "orientation", "focal_length", "FStop", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename"])
+# metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "orientation", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename", "Camera"])
 
 #canon has tuples 
-# df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime, focallength, Fstop, month, day, year, hour, minute, second, bytes, imagelist, location))
-# metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename", "location"])
+df = np.column_stack((lat, longitude, alt, cameradeets, iso, exposuretime, focallength, Fstop, month, day, year, hour, minute, second, bytes, imagelist, location, model))
+metadata = pd.DataFrame(df, columns = ["latitude", "longitude", "altitude","shotinfo","iso", "exposure_time1","exposure_time2", "focal_length1","focal_length2", "FStop1","FStop2", "month", "day", "year", "hour", "minute", "sec", "size_bytes", "filename", "location", "camera"])
 
-metadata.to_csv(folder + "iphone_photogps_data.csv", sep = ",", encoding = 'utf-8')
+metadata.to_csv(folder + "new_photogps_data.csv", sep = ",", encoding = 'utf-8')
