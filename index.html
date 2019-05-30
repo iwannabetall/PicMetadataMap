@@ -44,6 +44,7 @@
       <button onclick="ShowAll()">Show Markers</button>
       <button onclick="HideAll()">Hide Markers</button>
       <button onclick="ZoomOut()">Super Zoom Out</button>
+      <button onclick="stopAnimation()">Stop Animation</button>
     </div>
 
     <div id='clock'></div>
@@ -64,6 +65,7 @@
 			var locations = []
 			var markerarray = []
 			var animateMarkers = []
+			var animations = [] // to kill setTimeout 
 			// hard code list of locations to animate 
 			var locationList = ["I_eland", "China", "Australia", "Tahoe-SF", "Eclipse", "Borrego Springs", "Florida - Key Largo", "France", "London/Scotland", "Arizona"]
 
@@ -89,21 +91,50 @@
 				locations.push({lat:metadata[i].latitude, lng: metadata[i].longitude, place: metadata[i].location, time: metadata[i].time})
 			}
 
-			function placeMarkers(map, data, timeout) {
-				map.setZoom(10)
+			function stopAnimation() {
+				for (j=0; j < animations.length; j++){
+					clearTimeout(animations[j])						
+				}
+				markerCluster.removeMarkers(animateMarkers);	
+			}
+
+			function placeMarkers(map, data, timeout) {				
+				//clear any animations that exist
+				for (j=0; j < animations.length; j++){
+					clearTimeout(animations[j])					
+				
+				}
+				if (animations.length > 0) {
+					markerCluster.removeMarkers(animateMarkers);	
+				}
+				// reset the size of the markers 
+				animateMarkers = []
+				animations = []
 				
 				for (var i = 0; i < data.length; i++) {
 			    	(function(i) {
-			        	window.setTimeout(function() {
+			        	var animation = setTimeout(function() {
+			        		markerCluster.removeMarkers(animateMarkers);
 			        		animateMarkers.push(new google.maps.Marker({
 			        			position: new google.maps.LatLng(data[i].latitude, data[i].longitude),
-			        			animation: google.maps.Animation.DROP,
+			        			// animation: google.maps.Animation.DROP,
 			        			map: map
-			        		}));
-			        		map.panTo(new google.maps.LatLng(data[i].latitude, data[i].longitude))
+			        		}));			        		
+			        		// if (i % 100 == 0) {
+			        		// 	map.panTo(new google.maps.LatLng(data[i].latitude, data[i].longitude));	
+			        		// 	// map.setZoom(12)
+			        		// }			      
+			        		markerCluster = new MarkerClusterer(map, animateMarkers,
+				    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
 			        	}, timeout*i);
+
+			        	// array of set timeouts case we need to kill it 
+			        	animations.push(animation)
+
 			        })(i);
 			    }
+
 			}
 
 			function playTrip(trip) {
@@ -114,21 +145,18 @@
 					return a.time - b.time;
 				});
 
-				console.log(tripData)
+				// console.log(tripData)
 
 				// clear map of markers/clusters 
-				markerCluster.removeMarkers(markers);
 				HideAll()
 				// zoom to center of location 
-				map.setZoom(6)
+				map.setZoom(10)
 				map.panTo(new google.maps.LatLng(tripData[0].latitude, tripData[0].longitude))
 				// animate 
 				// var animateMarkers = []
 				var secBetweenPics = []
-
-
 				
-				placeMarkers(map, tripData, 200)
+				placeMarkers(map, tripData, 300)
 				// var mainTl = new TimelineMax({ onUpdate: updateSlider })
 
 				var mainTl = new TimelineMax()
@@ -203,6 +231,7 @@
 				    // position: location,
 				    position: new google.maps.LatLng(locations[i].lat, locations[i].lng),
 				    name: locations[i].place,
+				    map: map
 				    // label: locations[i].place
 				    // label: labels[i % labels.length]
 				  });
@@ -222,16 +251,22 @@
 				    map: map
 					})
 				  markerarray.push(markerpoint)
-				}) 	       
+				})
+				
 			}
 
 			function ShowAll() {  
 				markerarray.forEach(function(marker) {
 				  marker.setMap(map);
 				});
+
+				markerCluster = new MarkerClusterer(map, markers,
+				    {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+
 			}    
 
 			function HideAll() {
+				markerCluster.removeMarkers(markers);
 				markerarray.forEach(function(marker) {
 				  marker.setMap(null);
 				});
