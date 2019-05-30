@@ -34,26 +34,32 @@
 				z-index: 5;
 				margin-left: 5px;
 
+			}
 
+			#clock {
+				display: block;
 			}
     </style>
     <script src="pic2019_animate.json"></script>        
   </head>
   <body>
     <div id="floating-panel">
-      <button onclick="ShowAll()">Show Markers</button>
-      <button onclick="HideAll()">Hide Markers</button>
-      <button onclick="ZoomOut()">Super Zoom Out</button>
-      <button onclick="stopAnimation()">Stop Animation</button>
-    </div>
+    	<div>
+    		<button onclick="ShowAll()">Show All</button>
+	      <button onclick="HideAll()">Hide All</button>
+	      <button onclick="ZoomOut()">Zoom Out</button>
+	      <button onclick="stopAnimation()">Stop Animation</button>	
+    	</div>  
+      <div>
+      	<span>Play: </span>
+          <!-- id='location-container' -->
+	    	<button type='button' onclick='playTrip(this.value)' value='Fort Augustus'>Fort Augustus</button>
+	    	<button type='button' onclick='playTrip(this.value)' value='Glenfinnan'>Glenfinnan</button>    	
+	    	<button type='button' onclick='playTrip(this.value)' value='Isle of Skye'>Isle of Skye</button>    	
+    	</div>
+    	<div id='clock'></div>
+    </div>    
 
-    <div id='clock'></div>
-
-    <div id='location-container'>    
-    	<button type='button' onclick='playTrip(this.value)' value='Fort Augustus'>Play Fort Augustus</button>
-    	<button type='button' onclick='playTrip(this.value)' value='Glenfinnan'>Play Glenfinnan</button>    	
-    	<button type='button' onclick='playTrip(this.value)' value='Isle of Skye'>Play Isle of Skye</button>
-    </div>
 
     <div id="map"></div>
 
@@ -71,17 +77,19 @@
 
 			for (i=0; i < metadata.length; i++){
 
+				// moment(metadata[i].Date, "MM-DD-YYYY").add(metadata[i].hour, 'hours').add(metadata[i].minute,'minutes').add(metadata[i].sec, 'seconds').format('LLLL')
 				// clean up time zone
 				if (metadata[i].Type == 'Canon') {
 					if (metadata[i].location == "London/Scotland") {
-						metadata[i].time = moment(new Date(metadata[i].year, metadata[i].month-1, metadata[i].day, metadata[i].hour, metadata[i].minute, metadata[i].sec)).add(5, 'hours')
+						metadata[i].time = moment(metadata[i].Date, "MM-DD-YYYY").add(metadata[i].hour, 'hours').add(metadata[i].minute,'minutes').add(metadata[i].sec, 'seconds').add(5,'hours')
+						// metadata[i].time = moment(new Date(metadata[i].year, metadata[i].month-1, metadata[i].day, metadata[i].hour, metadata[i].minute, metadata[i].sec)).add(5, 'hours')
 					} else if (metadata[i].location == "Tahoe-SF") {
-						metadata[i].time = moment(new Date(metadata[i].year, metadata[i].month-1, metadata[i].day, metadata[i].hour, metadata[i].minute, metadata[i].sec)).add(-3, 'hours')
+						metadata[i].time = moment(metadata[i].Date, "MM-DD-YYYY").add(metadata[i].hour, 'hours').add(metadata[i].minute,'minutes').add(metadata[i].sec, 'seconds').add(-3,'hours')
 					}
 					
 				} else {
 					// placeholder for now -- FIX THIS LATER 
-					metadata[i].time = moment(new Date(metadata[i].year, metadata[i].month-1, metadata[i].day, metadata[i].hour, metadata[i].minute, metadata[i].sec))
+					metadata[i].time = moment(metadata[i].Date, "MM-DD-YYYY").add(metadata[i].hour, 'hours').add(metadata[i].minute,'minutes').add(metadata[i].sec, 'seconds').add(5,'hours')
 				}
 								
 				// var inListIndex = locationList.indexOf(metadata[i].location)
@@ -114,12 +122,15 @@
 				for (var i = 0; i < data.length; i++) {
 			    	(function(i) {
 			        	var animation = setTimeout(function() {
+
 			        		markerCluster.removeMarkers(animateMarkers);
 			        		animateMarkers.push(new google.maps.Marker({
 			        			position: new google.maps.LatLng(data[i].latitude, data[i].longitude),
 			        			// animation: google.maps.Animation.DROP,
 			        			map: map
-			        		}));			        		
+			        		}));  
+			        		// console.log(data[i].time)
+			        		document.getElementById('clock').innerHTML = data[i].time.format("dddd, MMMM Do YYYY, h:mm:ss a")  // format LLLL prob cleaner
 			        		// if (i % 100 == 0) {
 			        		// 	map.panTo(new google.maps.LatLng(data[i].latitude, data[i].longitude));	
 			        		// 	// map.setZoom(12)
@@ -145,7 +156,7 @@
 					return a.time - b.time;
 				});
 
-				// console.log(tripData)
+				console.log(tripData)
 
 				// clear map of markers/clusters 
 				HideAll()
