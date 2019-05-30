@@ -55,7 +55,10 @@
           <!-- id='location-container' -->
 	    	<button type='button' onclick='playTrip(this.value)' value='Fort Augustus'>Fort Augustus</button>
 	    	<button type='button' onclick='playTrip(this.value)' value='Glenfinnan'>Glenfinnan</button>    	
-	    	<button type='button' onclick='playTrip(this.value)' value='Isle of Skye'>Isle of Skye</button>    	
+	    	<button type='button' onclick='playTrip(this.value)' value='Isle of Skye'>Isle of Skye</button>  
+	    	<br>  	
+	    	<button type='button' onclick='playTrip(this.value)' value='Fairy Pools'>Fairy Pools</button>
+	    	<button type='button' onclick='playTrip(this.value)' value='Last Day'>Time to Go</button>
     	</div>
     	<div id='clock'></div>
     </div>    
@@ -106,7 +109,8 @@
 				markerCluster.removeMarkers(animateMarkers);	
 			}
 
-			function placeMarkers(map, data, timeout) {				
+			function placeMarkers(map, data, timeout) {		
+
 				//clear any animations that exist
 				for (j=0; j < animations.length; j++){
 					clearTimeout(animations[j])					
@@ -149,6 +153,7 @@
 			}
 
 			function playTrip(trip) {
+				console.log(metadata)
 				var tripData = metadata.filter(function(d) { return d.Trip == trip })
 
 				// sort in chron order
