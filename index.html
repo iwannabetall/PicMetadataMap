@@ -40,7 +40,7 @@
 				display: block;
 			}
     </style>
-    <script src="pic2019_animate.json"></script>        
+    <script src="pic2019_forAnimation.json"></script>        
   </head>
   <body>
     <div id="floating-panel">
@@ -55,10 +55,16 @@
           <!-- id='location-container' -->
 	    	<button type='button' onclick='playTrip(this.value)' value='Fort Augustus'>Fort Augustus</button>
 	    	<button type='button' onclick='playTrip(this.value)' value='Glenfinnan'>Glenfinnan</button>    	
-	    	<button type='button' onclick='playTrip(this.value)' value='Isle of Skye'>Isle of Skye</button>  
-	    	<br>  	
+	    	<button type='button' onclick='playTrip(this.value)' value='Isle of Skye'>Isle of Skye</button>  	    	
 	    	<button type='button' onclick='playTrip(this.value)' value='Fairy Pools'>Fairy Pools</button>
-	    	<button type='button' onclick='playTrip(this.value)' value='Last Day'>Time to Go</button>
+	    	<br>  	
+	    	<button type='button' onclick='playTrip(this.value)' value='Rogge Cloof'>Rogge Cloof</button>
+	    	<button type='button' onclick='playTrip(this.value)' value='Sutherland Drive'>To Sutherland</button>
+	    	<button type='button' onclick='playTrip(this.value)' value='Sutherland Return Drive'>From Sutherland</button>
+	    	<button type='button' onclick='playTrip(this.value)' value='Zimanga Drive'>Zimanga Drive</button>
+	    	<button type='button' onclick='playTrip(this.value)' value='ZN Drive 1'>ZN Drive 1</button>	    
+
+	    	<!-- <button type='button' onclick='playTrip(this.value)' value='Last Day'>Time to Go</button> -->
     	</div>
     	<div id='clock'></div>
     </div>    
@@ -88,6 +94,8 @@
 						// metadata[i].time = moment(new Date(metadata[i].year, metadata[i].month-1, metadata[i].day, metadata[i].hour, metadata[i].minute, metadata[i].sec)).add(5, 'hours')
 					} else if (metadata[i].location == "Tahoe-SF") {
 						metadata[i].time = moment(metadata[i].Date, "MM-DD-YYYY").add(metadata[i].hour, 'hours').add(metadata[i].minute,'minutes').add(metadata[i].sec, 'seconds').add(-3,'hours')
+					} else if (metadata[i].location == "South Africa!") {
+						metadata[i].time = moment(metadata[i].Date, "MM-DD-YYYY").add(metadata[i].hour, 'hours').add(metadata[i].minute,'minutes').add(metadata[i].sec, 'seconds').add(6,'hours')
 					}
 					
 				} else {
